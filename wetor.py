@@ -47,13 +47,19 @@ def get_content_from_url(url):
 
     return content
 
+def notify(url, target):
+    html = get_content_from_url(url)
+    retlist = re.findall('switch switch_on',html)
+    if len(retlist) == 1:
+        print "%s, you have got a message." % target
+    global timer
+    timer = threading.Timer(60, notify, [url, target])
+    timer.start()
+
 if __name__ == '__main__':
     if len(sys.argv) != 2:
         print "ONE argument, the url needed"
         sys.exit(-1)
-    html = get_content_from_url(sys.argv[1])
-    retlist = re.findall('switch switch_on',html)
     #for ret in retlist:
     #    print ret
-    if len(retlist) == 1:
-        print "CALL notify API"
+    timer = threading.Timer(1, notify, [sys.argv[1],"Luoben's phone"])
