@@ -47,13 +47,19 @@ def get_content_from_url(url):
 
     return content
 
-def notify(url, target):
+def notify(url, pattern, target):
     html = get_content_from_url(url)
-    retlist = re.findall('switch switch_on',html)
-    if len(retlist) == 1:
+    retlist = re.findall(pattern, html)
+    global notified
+    if len(retlist) == 1 and not notified:
         print "%s, you have got a message." % target
+        notified = True
+    elif len(retlist) == 0 and notified:
+        notified = False
+    else:
+        print "notifed"
     global timer
-    timer = threading.Timer(60, notify, [url, target])
+    timer = threading.Timer(300, notify, [url, pattern, target])
     timer.start()
 
 if __name__ == '__main__':
@@ -62,4 +68,6 @@ if __name__ == '__main__':
         sys.exit(-1)
     #for ret in retlist:
     #    print ret
-    timer = threading.Timer(1, notify, [sys.argv[1],"Luoben's phone"])
+    notified = False
+    timer = threading.Timer(1, notify, [sys.argv[1], "switch switch_on", "Luoben's phone"])
+    timer.start()
