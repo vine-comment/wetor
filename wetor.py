@@ -11,6 +11,7 @@ import sys
 import threading
 from multiprocessing import Process
 from string import capitalize
+import xinge
 
 try: 
     input = raw_input
@@ -52,7 +53,8 @@ def notify(url, pattern, target):
     retlist = re.findall(pattern, html)
     global notified
     if len(retlist) == 1 and not notified:
-        print "%s, you have got a message." % target
+        #print "%s, you have got a message." % target
+        print xinge.PushAllAndroid(access_id, secret_key, '', 'Come to my show!')
         notified = True
     elif len(retlist) == 0 and notified:
         notified = False
@@ -69,5 +71,7 @@ if __name__ == '__main__':
     #for ret in retlist:
     #    print ret
     notified = False
+    access_id = 2100034106
+    secret_key = "a2578e26d5d44ff44cce85481ff9a179"
     timer = threading.Timer(1, notify, [sys.argv[1], "switch switch_on", "Luoben's phone"])
     timer.start()
