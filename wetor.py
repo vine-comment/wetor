@@ -102,7 +102,7 @@ def notify(url, pattern):
         notified = True
     elif len(retlist) == 0 and notified:
         notified = False
-    else:
+    elif len(retlist) == 1 and notified:
         print "notifed"
     global timer
     timer = threading.Timer(300, notify, [url, pattern])
@@ -119,5 +119,6 @@ if __name__ == '__main__':
     secret_key = "a2578e26d5d44ff44cce85481ff9a179"
     x = xinge.XingeApp(access_id, secret_key)
     msg = BuildNotification()
+    print "====== Start monitoring %s ======" % sys.argv[1]
     timer = threading.Timer(1, notify, [sys.argv[1], "switch switch_on"])
     timer.start()
