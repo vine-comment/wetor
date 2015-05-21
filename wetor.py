@@ -49,11 +49,11 @@ def get_content_from_url(url):
     return content
 
 # 定义通知
-def BuildNotification():
+def BuildNotification(url, title, content):
     msg = xinge.Message()
     msg.type = xinge.Message.TYPE_NOTIFICATION
-    msg.title = '斗鱼'
-    msg.content = '我给大爷笑一个'
+    msg.title = title
+    msg.content = content
     # 消息为离线设备保存的时间，单位为秒。默认为0，表示只推在线设备
     msg.expireTime = 86400
     # 定时推送，非必须
@@ -77,7 +77,7 @@ def BuildNotification():
     # 以下例子为点击打开url
     action = xinge.ClickAction()
     action.actionType = xinge.ClickAction.TYPE_URL
-    action.url = 'http://www.douyutv.com/211086'
+    action.url = url
     # 打开url不需要用户确认
     action.confirmOnUrl = 0
     msg.action = action
@@ -118,7 +118,12 @@ if __name__ == '__main__':
     access_id = 2100034106
     secret_key = "a2578e26d5d44ff44cce85481ff9a179"
     x = xinge.XingeApp(access_id, secret_key)
-    msg = BuildNotification()
-    print "====== Start monitoring %s ======" % sys.argv[1]
+
+    url = sys.argv[1]
+    title = "斗鱼老司机"
+    content = url
+    msg = BuildNotification(url, title, content)
+
+    print "====== Start monitoring %s ======" % url
     timer = threading.Timer(1, notify, [sys.argv[1], "switch switch_on"])
     timer.start()
