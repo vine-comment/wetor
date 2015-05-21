@@ -125,5 +125,5 @@ if __name__ == '__main__':
     msg = BuildNotification(url, title, content)
 
     print "====== Start monitoring %s ======" % url
-    timer = threading.Timer(1, notify, [sys.argv[1], "switch switch_on"])
+    timer = threading.Timer(1, notify, [url, "switch switch_on"])
     timer.start()
