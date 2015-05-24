@@ -13,6 +13,12 @@ from multiprocessing import Process
 from string import capitalize
 import xinge
 
+ISOTIMEFORMAT='%m-%d %H:%M'
+UrlDict = {"http://www.douyutv.com/16789":"安德罗妮丶",
+           "http://www.douyutv.com/25515":"秋日丶",
+           "http://www.douyutv.com/211086":"赵小臭",
+           "http://www.douyutv.com/fxy":"风行云"}
+
 try: 
     input = raw_input
 except NameError:
@@ -71,6 +77,7 @@ def BuildNotification(url, title, content):
     # 通知展示样式，仅对通知有效
     # 样式编号为2，响铃，震动，不可从通知栏清除，不影响先前通知
     style = xinge.Style(2, 1, 1, 0, 0)
+    style.lights = 1
     msg.style = style
 
     # 点击动作设置，仅对通知有效
@@ -96,8 +103,8 @@ def notify(url, pattern):
     retlist = re.findall(pattern, html)
     global notified
     if len(retlist) == 1 and not notified:
-        #print "%s, you have got a message." % target
-        #print xinge.PushAllAndroid(access_id, secret_key, '', 'Come to my show!')
+        msg.content = time.strftime(ISOTIMEFORMAT, time.localtime())+" " \
+                      + UrlDict[url] + msg.content
         print x.PushAllDevices(0, msg)
         notified = True
     elif len(retlist) == 0 and notified:
@@ -121,7 +128,7 @@ if __name__ == '__main__':
 
     url = sys.argv[1]
     title = "斗鱼老司机"
-    content = url
+    content = " 上线啦 点击追剧 >>"
     msg = BuildNotification(url, title, content)
 
     print "====== Start monitoring %s ======" % url
