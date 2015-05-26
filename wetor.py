@@ -12,12 +12,14 @@ import threading
 from multiprocessing import Process
 from string import capitalize
 import xinge
+import logging
 
 ISOTIMEFORMAT='%m-%d %H:%M'
 UrlDict = {"http://www.douyutv.com/16789":"安德罗妮丶",
            "http://www.douyutv.com/25515":"秋日丶",
            "http://www.douyutv.com/211086":"赵小臭",
-           "http://www.douyutv.com/fxy":"风行云"}
+           "http://www.douyutv.com/fxy":"风行云",
+           "http://www.douyutv.com/241449":"Alex"}
 
 try: 
     input = raw_input
@@ -50,16 +52,16 @@ def get_content_from_url(url):
             attempts += 1
             time.sleep(2)
             #url_lock.release()
-            print(e)
+            logging.ERROR(e)
 
     return content
 
+
 # 定义通知
-def BuildNotification(url, title, content):
+def BuildNotification(url):
     msg = xinge.Message()
     msg.type = xinge.Message.TYPE_NOTIFICATION
-    msg.title = title
-    msg.content = content
+    msg.title = title_global
     # 消息为离线设备保存的时间，单位为秒。默认为0，表示只推在线设备
     msg.expireTime = 86400
     # 定时推送，非必须
@@ -104,15 +106,14 @@ def notify(url, pattern):
     global notified
     if len(retlist) == 1 and not notified:
         msg.content = time.strftime(ISOTIMEFORMAT, time.localtime())+" " \
-                      + UrlDict[url] + msg.content
-        print x.PushAllDevices(0, msg)
+                      + UrlDict[url] + content_global
+        logging.info(x.PushAllDevices(0, msg))
         notified = True
     elif len(retlist) == 0 and notified:
         notified = False
-    elif len(retlist) == 1 and notified:
-        print "notifed"
+        logging.info(UrlDict[url] + " off line")
     global timer
-    timer = threading.Timer(300, notify, [url, pattern])
+    timer = threading.Timer(interval_global, notify, [url, pattern])
     timer.start()
 
 if __name__ == '__main__':
@@ -121,16 +122,30 @@ if __name__ == '__main__':
         sys.exit(-1)
     #for ret in retlist:
     #    print ret
-    notified = False
-    access_id = 2100034106
-    secret_key = "a2578e26d5d44ff44cce85481ff9a179"
+    notified = True
+    access_id = 2100117119
+    secret_key = "e19a1e2dcd5ec42cca9e8e1b9922dfba"
+
+#test id begin
+#    access_id = 2100034106
+#    secret_key = "a2578e26d5d44ff44cce85481ff9a179"
+#test id end
     x = xinge.XingeApp(access_id, secret_key)
 
     url = sys.argv[1]
-    title = "斗鱼老司机"
-    content = " 上线啦 点击追剧 >>"
-    msg = BuildNotification(url, title, content)
+    title_global = "斗鱼老司机"
+    content_global = " 上线啦 点击追剧 >>"
+    msg = BuildNotification(url)
 
-    print "====== Start monitoring %s ======" % url
+    interval_global = 300
+    logfile = "/opt/wetor/log/"+UrlDict[url]+".log"
+    logging.basicConfig(level=logging.DEBUG,
+                format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
+                datefmt='%a, %d %b %Y %H:%M:%S',
+                filename=logfile,
+                filemode='w')
+
+
+    logging.info("====== Start monitoring %s ======" % url)
     timer = threading.Timer(1, notify, [url, "switch switch_on"])
     timer.start()
